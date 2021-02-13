@@ -1,0 +1,51 @@
+---
+title: "Analysis"
+author: "Sydney Berman"
+date: "February 12, 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rentrez)
+library(ggplot2)
+library(knitr)
+library(dplyr)
+```
+##Analysis of Borrelia burgdorferi sequences 
+You can read more about the bacteria here: https://en.wikipedia.org/wiki/Borrelia_burgdorferi#:~:text=Borrelia%20burgdorferi%20is%20a%20bacterial,known%20to%20cause%20the%20disease).
+
+![An image of Borrelia burgdorferi](bb.jpg)
+
+Import the Sequence file 
+```{r }
+dat<-read.csv("Sequences.csv",header=T) #import data set 
+```
+
+Count the number of each base pair (A, T, C and G), in each of the three sequences. (Hint: do not include any characters from the header, use the nucleotide sequence only; you MIGHT use gsub(), nchar(), for loops, if/then statements)
+```{r}
+A<-nchar(gsub("[^A]","",dat$Sequence))
+T<-nchar(gsub("[^T]","",dat$Sequence))
+C<-nchar(gsub("[^C]","",dat$Sequence))
+G<-nchar(gsub("[^G]","",dat$Sequence))
+  
+Nucleotides<-data.frame(Name=dat$Name,A,T,C,G)
+kable(Nucleotides) #makes a nicer table of the data frame from knitr package 
+```
+
+Calculate GC Content (% of nucleotides that are G or C) and create a final table showing GC content for each sequence ID
+```{r}
+CName=sub("(\\w+).*","\\1",dat$Name) #condenses the name so just sequence ID
+
+total<-sum(A,T,C,G) #if we wanted to find total for all strains 
+
+content=c() #create an empty vector for for loop to fill with the gc content for each strain 
+
+for (i in 1:length(dat$Sequence)){
+ content[i]<-sum(C[i],G[i])/sum(A[i],T[i],C[i],G[i]) #will go through each sequence id and divide gc content by total number of bp per sequence id  to get percentage of GC 
+}
+
+GCtable<-data.frame("Sequence ID"=CName,"GC Percentage Content"=content*100) #create a data frame of GC content
+kable(GCtable) #makes a table of the data frame
+```
+
