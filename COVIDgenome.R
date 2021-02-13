@@ -1,35 +1,22 @@
 #PART 2
-#Using what you have learned, make a new script called COVIDgenome.R that will 
 #download the SARS-CoV-2 reference genome from Genbank. Use the accession NC_045512.2
 #The Spike glucoprotein  (aka S protein) plays an important role in infection, and therefore it determines the virulence of the strain and it's a target for vaccines and other therapeutic drugs.
 library(sangerseqR)
 
-seq<-scan("sequence.gb",what="character",sep="\n")
+cov<-scan("./sequence.gb",what="character",sep="\n") #import file into R as object 
+print(cov) #verify object is correct
 
-?scan
-print(seq)
+Seq<-gsub(".*1 *([gatc])","\\1",paste(cov)) #delete everythign before the DNA sequence 
+paste(Seq,collapse=" ") #collapse into one string
 
-Seq<-gsub(".*1*([gatc]) ","\\1", paste(seq)) #delete everythign before the DNA sequence 
-print(Seq)
-paste(Seq,collapse=" ")
 Seq<-gsub(".*ORIGIN +","",paste(Seq,collapse="")) #eliminate text before sequence 
-Seq
 Seq<-gsub(" |//","",Seq) #eliminate space and // at end 
-Seq
+nchar(Seq) #counts the number of nucleotides 
 
 #The S protein starts at bp position 21,563 and ends at position 25,384
-#Use regular expressions in R to isolate the S protein from the genome you downloaded
-grepl( , Seq)
-gregexcpr({[21563],[25384]},Seq)
-?sapply
-?regexpr
+S<-substr(Seq,21563,25384) #isolates the nucleotides between the 2 base pair positions 
+nchar(S) #verify all the nucleotides were captured
 
-nchar(Seq)
-
-substr(Seq,21563,25384)
-
-#this gene is highly conserved at only 99%
-
-#Open a BLAST search in your web browser. Manually paste in the sequence and run the BLAST search with default parameters.
-#It may take a few minutes for the search to run. After it's finished, look at the tabs Descriptions, Graphic Summary, and Alignments.
-#Would you say this gene is highly conserved or evolving rapidly? Why?  Explain this in a comment at the end of your second script.
+#After running the sequence for the S protein in blast I believe this gene is highly conserved. There were 100 sequences with significant 
+#alignments with zero evalue meaning there is no background noise in these hits. Most had 100% percent identity with the 
+#furthest variant still having 99.92% conserved. The graphic also showed alignment scores all >=200. 
